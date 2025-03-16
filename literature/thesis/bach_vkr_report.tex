@@ -1,0 +1,591 @@
+\documentclass[14pt]{extreport}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[a4paper,left=2.50cm,right=1.50cm,top=1.50cm,bottom=1.50cm]{geometry}
+\usepackage[bookmarks]{hyperref}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{setspace}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage[shortlabels]{enumitem}
+\usepackage{amssymb}
+\usepackage{fontspec}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{verbatim}
+\usepackage[toc,section=section]{glossaries}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{indentfirst}
+\setlength{\parindent}{20pt}
+\usepackage{titlesec}
+\titleformat{\chapter}{\large\bfseries}{\thechapter}{1em}{}
+
+\usepackage{tocloft} % table of contents styling
+\renewcommand{\cfttoctitlefont}{\Large\bfseries}
+
+\setmainfont{Times New Roman}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+\setcounter{secnumdepth}{2}
+
+\counterwithout{section}{chapter}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+\newcommand{\gap}[2]{\(\underset{\text{#1}}{\underline{\hspace{#2}}}\)}
+\newcommand{\withBreaks}[2][c]{\begin{tabular}{#1}\\[-6.5mm]#2\end{tabular}}
+\DeclareMathOperator{\ev}{\mathbb E}
+
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+
+\usepackage{glossaries}
+
+\makeglossaries
+
+\newacronym{eeg}{EEG}{electroencephalogram}
+\newacronym{psd}{PSD}{power spectral density}
+\newacronym{gan}{GAN}{Generative Adversarial Network}
+\newacronym{wgan}{WGAN}{Wassertein \acrshort{gan}}
+
+\newacronym{hvha}{HVHA}{High \Gls{valence} High \Gls{arousal}}
+\newacronym{hvla}{HVLA}{High \Gls{valence} Low \Gls{arousal}}
+\newacronym{lvha}{LVHA}{Low \Gls{valence} High \Gls{arousal}}
+\newacronym{lvla}{LVLA}{Low \Gls{valence} Low \Gls{arousal}}
+
+
+
+\newglossaryentry{ambient}
+{
+    name={ambient music},
+    description={ a genre of music that emphasizes tone and atmosphere over traditional musical structure or rhythm. A form of instrumental music, it may lack net composition, beat, or structured melody}
+}
+
+\newglossaryentry{arousal}
+{
+    name={arousal},
+    description={ a measure of emotional state, reflecting the level of autonomic activation that an event creates, and ranges from calm (or low) to excited (or high). Also referred as Intensity}
+}
+
+\newglossaryentry{valence}
+{
+    name={valence},
+    description={ a measure of emotional state, reflecting is the level of pleasantness that an event generates, and ranges from negative (or low) to positive (or high). Also referred as Pleasantness}
+}
+
+\newglossaryentry{circumplex}
+{
+    name={circumplex model},
+    description={ framework for representing human emotions with pair of coordinates: valence and arousal}
+}
+
+\newglossaryentry{latent}
+{
+    name={latent vector},
+    description={ in the context of \acrshort{gan}s, is a vector sampled from some random distribution, serving as a point in latent space, for \acrshort{gan} to map into the desired distribution (e.g. a specific image)}
+}
+
+\newglossaryentry{conditional}
+{
+    name={conditional \acrshort{gan}},
+    description={ a \acrshort{gan} modified to generate, and discriminate images based on the ``condition", most often coming in the form of class-label of images (e.g. classes dog and cat)}
+}
+
+\newglossaryentry{dcn}
+{
+    name={Deep Convolutional Networks},
+    description={ a type of neural networks that features usage of \glspl{conv} and hidden layers between the input and output layers}
+}
+
+\newglossaryentry{conv}
+{
+    name={convolutional layer},
+    description={ a type of layer used in neural networks which generates new ``features" based on immediate neighboring neurons, via usage of multiplication with striding ``kernels" matrices}
+}
+
+
+\title{Project report}
+\author{Anton Ivanov, 191}
+
+
+\begin{document}
+\thispagestyle{empty}
+ \onehalfspacing % Set line spacing to 1.5
+\setlength{\parindent}{0pt}
+
+\begin{center}
+    \textbf{NATIONAL RESEARCH UNIVERSITY} \\
+    \textbf{HIGHER SCHOOL OF ECONOMICS}
+
+    Faculty of Computer Science \\
+    Bachelor's Programme in Data Science and Business Analytics
+    \vfill
+
+    \textbf{\Large BACHELOR'S THESIS} \\
+    \vspace{3mm}
+    {\large \textbf{Research Project}} \\
+    \vspace{2mm}
+    \textbf{\large Study of the Relationship between Music and EEG}
+    \vfill
+\end{center}
+\vspace{3cm}
+{\textbf{\large Prepared by the Student of Group DSBA191 in Year 4},} \\
+\textbf{\large Ivanov Anton Pavlovich} \newline
+
+{\textbf{\large Thesis Supervisor}, \\
+\textbf{\large PhD, Associate Professor, Chernyshev Vsevolod Leonidovich} }
+
+\vspace{3cm}
+
+\begin{center}
+    \textbf{\large Moscow} \\ 
+    \textbf{\large 2023}
+\end{center}
+\vfill
+
+\clearpage
+\pagenumbering{arabic} 
+\tableofcontents
+\clearpage
+% \printglossary
+\clearpage
+
+\setlength{\parskip}{0.5 em}
+
+
+\section*{Abstract}
+\par Music is known to have ability to evoke all kinds of emotional responses in humans and, as such, is used to great extent in all sorts of media (e.g. theatrical plays, video games, cinema) to better translate the mood to the audience. However, while it is possible to associate a musical piece with a specific emotion it evokes in general, everyone's perception of music is different and human artists cannot be expected to create fully personalised musical pieces. This paper proposes a two-fold system of personalised music generation aimed at shifting the emotional state of an individual to a desired one. In general, the system measures the user's emotional state through the EEG readings and assigns a position on a 2-dimensional Valence - Arousal plane, and uses the combination of the user input and current position on emotional plane to generate a musical piece with application of a model based on Transformers architecture conditioned on continuous valued emotions.
+
+\textbf{KEYWORDS: } \emph{emotions, music, midi, EEG, machine learning, transformers, GAN}
+
+\setlength{\parindent}{1cm}
+
+\section{Introduction}
+%%
+Generative models have gained a substantial notoriety in the recent years, with models such as MidJourney\cite{midj} and Stable Diffusion\cite{stable} capable of generating artistic images from almost any text prompt. Such popularity can be described by the ability of user directly describing the desired output and the model's power to deliver the required visual stimuli. When compared to visual media such as paintings, images or memes, music is much harder to systematically describe with natural language in a concise manner capturing the essence of it, allowing for a recreation or inspiration for a Deep Learning model. Instead, music is most often described in the language of emotions or feelings, that usually do not tell how it \textit{sounded} but rather what an \textit{individual felt} when listening to it.  
+
+To address this difference between audio and visual media we propose defining a medium for musical generation that allows the user to directly signalize what kind of music the model should generate, through emotions. Usually, in human interactions people use discrete-like definition of emotions: e.g. with emotional states such as \textit{happy} or \textit{angry}. Whilst such definition works well to describe how people feel in general, this definition has problems as a medium for music generation, as then it becomes hard to describe the similarity of emotions numerically, and then there differences in \textit{number of emotional states} are possible. 
+
+Usage of emotional input for music generation has also benefits in possible applications beyond the entertainment purposes, examples of which can be seen in mood-based recommendations and generated music-flows in streaming services such as Spotify, YouTube Music and Yandex Music. What should also be stated is the possibility of usage such generated music in treatment of psychological and mental conditions such as depression and psychosis \cite{depression}. For such applications we see the benefits of taking into account the current emotional state of the user to construct a musical piece evoking a more individualized emotion.
+
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \centering
+\includegraphics[width=0.25\textwidth]{images/1.png}
+\caption{EEG headset by NeuroSky}
+\label{fig:sky}
+\end{wrapfigure}
+
+Previous studies have shown that emotional state of individual reflects on their physiological signals from both the peripheral nervous system, i.e. heart rate, galvanic skin response, and central nervous system, that can be measured in the form of \acrfull{eeg}, with it being a method to record instantaneous brain activity in the form of electrical impulses measured with a set of metal discs - electrodes. While performing the classical \acrshort{eeg} recording used for medical diagnosis is a complicated procedure as anything involving measuring brain activity, and requires a specialized high-price device; a significant number of affordable \acrshort{eeg} devices small enough to be portable and used as a headset, (see figure \ref{fig:sky}) that are can provide an EEG sampled at a decently high frequencies quite accuratelyhave appeared on the market, which significantly lowers the bar for usage of \acrshort{eeg}-based emotion recognition in various applications.
+
+EEG can be thought of as a type of a measure of one's brain activity at the moments of time. Basically, it includes measuring the intensity electrical activity in the brain with use of several electrodes attached to a person's head, with number of electrodes ranging from a single electrode to 256 evenly spaced across the scalp. Naturally, the resulting electrograms can be treated as multivariate timeseries and signal analysis techniques can be applied to it. Overall, the motivation behind using EEG for emotion recognition lies within idea that emotions are foremost originate and \emph{perceive} in the brain and thus brain activity should reflect emotions in a way, generalizable between people and/or situations.
+
+Finally, having established both what is considered by ``emotions" and motifs behind EEG, the question of musical generation should be addressed. With some liberties taken, the instrumental music can be thought of as a combination of \emph{instructions} on how and when each instrument should be played, as well as predefined ``\emph{calibration}" of the aforementioned instruments (think of how musicians share music by sharing the guitar tabs / piano-rolls and etc.). If we assume that the change in the used instruments (e.g. guitar A to guitar B) causes an insignificant change in perceived mood of a musical piece, then the\emph{instructions} on how to play the instruments in standard tuning become a suitable medium for generating music conditioned on emotions. Moreover, most used instruments of bass, drums, guitar, piano and strings can be easily encoded in piano-roll notation which results in natural duality with .MIDI file format used for storing instrumental music in computers.
+
+This paper aims to answer the question whether the emotional state can be extracted from EEG recordings with sufficient quality for generating a pleasant and harmonical music aimed at improving the emotional state of users with possible applications such as therapy and leisure.
+
+% For the purposes of generalisation, this research will only consider piano music pieces, with minimal played note duration (resolution) of quarter beat. Without taking the ``\emph{settings}" into consideration, it is possible to encode any musical piece into an image, with ability of audio-preserving reverse decoding. Hence the problem of generating music can be reduced to just generating specific images. For that task, a pair of machine learning models that constitute a conditional-\acrfull{gan} was created and trained. Explicit details on music representation and the developed \acrshort{gan} are available in Sections 2.3 and 2.4 respectively.
+%%
+
+
+\section{Literature Review}
+This section provides analysis of various techniques and frameworks used in published papers in the related fields, and grouped into subsections corresponding to the works' logical division.
+
+\subsection{Modelling Emotions}
+As was discussed before, emotional states can be defined and summarised differently and studies usually fall into two categories based on the model they use: discrete and dimensional models studies. Discrete models get their name from their basis on a discrete finite set of emotions and is based on theory of basic emotions, that assumes that all emotions can be categorised with a primitive set of basic emotions. As the consequence of this definition, the similarity of two emotions has to defined separately and there is no definite way of doing this, moreover this models lack consitency of what constitutes the basic set of emotions, for instance, Paul Ekman in \cite{ekman} considered a set of 6 basic emotions, namely \emph{fear}, \emph{anger}, \emph{happiness}, \emph{disgust}, \emph{surprise}, \emph{sadness}, while other research consider as many as 27 basic emotions \cite{many}.
+
+Other frequently taken approach is the dimensional models for emotional representation, where emotions are encoded into 2-3 variables, which can be visualised as a circle or sphere depending on the chosen model. The basis of 2 or 3 axes, helps mitigate shortcomings of the discrete models, by introducing continuity and a notion of similarity between emotional states (e.g. through euclidean distance) and allowing to define emotional states to a neighborhood of points, rather than the rigid definition of a discrete model.
+
+\begin{figure}[h!]
+    \centering
+\includegraphics[width=0.6\textwidth]{images/circumplex-model.png}
+\caption{Russel's Circumplex Model as illustrated in the VGMidi paper, Ferreira et al\cite{vgmidi}.}
+\label{fig:circ}
+\end{figure}
+
+Commonly used dimensional model is Russel's circumplex model \cite{russel} based on two dimensions of \gls{valence} and \gls{arousal}, with \gls{valence} representing pleasantness of emotion, i.e. low valence state corresponds to an unpleasant (or negative) feeling, and high valence state represents a to pleasant (or positive) feeling, while \gls{arousal} indicates the level of excitement of a corresponding emotional state with low values representing dull states (e.g. tired or bored) and high values are reserved for intense feelings (e.g. anger or alerted). While Russel later expanded the model with a third axis of \emph{dominance}, most works in the field tend to use it as a supplementary variable or ignore it due to complexity. 
+
+Although dimensional models enable notion of similarity of different emotions, exact positions of each emotion on the coordinate grid are impossible to define in a single, only-right way. First problem with such models is that each individual has a slightly different understanding of a \emph{reference} emotion. As such, one individual would summarise Anger as very low valence and high arousal while another individual would say that Anger is a low valence and very high arousal emotion. Second thing that exacerbates the first issue is that emotions inherently attribute to a neighborhood of points on a this grid, rather than a single point, meaning there will always be a mismatch between two points of view/definition. Nevertheless, some general understanding of how basic emotions correspond with the \gls{circumplex} is provided in the figure \ref{fig:circ}.
+
+
+\subsection{Emotion Recognition / Classification}
+This section will cover various details, techniques and ideas that other works in the field used regarding methods of emotion recognition.
+
+R. Nawaz et al, in their work \cite{nawaz} trained a machine learning model predict binary \gls{valence}\gls{arousal} labels, (High / Low state for both variables) based on EEG signals after musical elicitation. The used input data consisted of 60 seconds of EEG recording sampled at 128Hz, which motivated the authors to remove first 20s of EEG readings to eliminate moodswing's impact on classification, and divided remaining 40s recording into four 10s segments. Similarly, Yimin and Shuaiqi removed 15s from beginning and end of each recording to limit the moodswing and fatigue\cite{yimin}. 
+
+Zhang et al. share a concurrent view of dropping peripheral readings. In the paper \cite{zhang} the researchers propose that middle segment of the reading is a good candidate for reflection of emotional state. More precisely, out of 60s of EEG readings, the researchers used the timeframe from 34s up to 42s (9s in total). 
+
+The commonly used schemes for data processing of EEG signals for emotion classification is the usage of a fixed, short window of 3-12s to generate samples, as well as to reduce the overlap between experiments by dropping beginning or end of recording to eliminate the effect of moodswing.
+
+The features used for training the classifiers range from statistical (e.g. channel-wise means and sum of absolute differences), fourier transformation based features, such as discretisized \acrfull{psd} (frequency-domain features), and using mildly processed raw timeseries in conjunction with complex models such as encoders (time-domain features). Bashivan et al. \cite{bashivan}, for instance, used 3-band \acrlong{psd} 2d maps generated from electrode positions in 3-channel CNN network to classify between negative and positive valued valence emotions. 
+
+Many studies choose to enlargen the observations in the dataset by dividing a larger EEG recording with the single label corresponding to it, into several (from 10 to 1000) smaller segments with setting label equal to the label of parent-segment. For example, Galvão et al. \cite{galvao} proposed dividing the 60s EEG recording into 2s windows with 1.75s overlap and tranforming into frequency-space with fast fourier transform as the data augmentation/feature engineering process. This resulted in reported 89.8\% within-subject classification rate for binary arousal/valence. The 90 percent metric seems inflated when compared to 60-65 percent accuracy achieved by other contemporary studies which can be explained with two reasons: the data augmentation resulted in existence of heavily correlated samples between train and test sets, and the choice of Nearest-Neigbour classifier which is most prone to such errors. 
+
+From the examined papers evaluation schemes we observe the expected applications of the proposed frameworks: collect data on a new subject (individual) by recording EEG during the act of listening to the music, and use the model predictions for future music listening to infer the emotional state. Primarily, this is observed from reporting the subject-averaged k-fold cross validation scores (folds = different EEG recordings of a single subject), rather than usage of hold-out subjects as evaluation sets.
+
+
+
+\subsection{Music Generation}
+
+State of the art procedures for conditional music generation can be divided into two categories: preset rules for music alteration / generation from existing pieces based on random sampling and deterministic functions; and \textbf{Machine Learning} oriented algorithms with use of generative models. 
+
+A more classical approach with preset rules approach for generating musical pieces involves  modifications of existing musical pieces based on a predefined set of rules. For instance, Leslie et al\cite{leslie}, engineered a music producing system that is influenced by the user's breathing rate to induce a relaxation response. Their approach was to generate \gls{ambient}, and then modify the loudness and tempo of the music based on the user's breathing rate. The system could successfully induce relaxation response, the given rule-based approach is not suited for creating entirely new musical pieces due to lack of required flexibility in the rules, and their general constraint by the designer's abilities, which results in a lack of sense \emph{creativity} for such algorithms.
+
+A possible better alternative can be found in using deep learning techniques for creating an algorithm to produce specific musical pieces with learning of еру underlying \emph{rules} from the existing tracks itself. Over the past years many different architectures were adapted to the use for symbolic music, including but not limited to residual neural networks (RNN), long-short term memory (LSTM) networks, generative adversarial networks (GAN) and models inspired by natural language processing breakthrough of transformer architecture.
+
+Overall, there are two primary approaches that are used for symbolic music generation: representing music as sequential data, akin that of a sequences of words in NLP, and representing music as series of images, similar to pages of sheet music (\emph{partitur}). For instance, works such as MuseGAN \cite{musegan}  propose combining the representation of MIDI files as images and \acrlong{gan} that are used to great effect for image generation to generate symbolic music. An example of MuseGAN's music representation is available at figure \ref{fig:musegan}.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{images/musegan.png}
+\caption{Piano-roll representations of two music fragments with five tracks as presented in MuseGAN\cite{musegan}}
+\label{fig:musegan}
+\end{figure}
+
+MuseGAN's approach has several limitations, such a fixed music tempo, and as usually tracks with a faster tempo can be perceived as more energetic and, possibly, in a more pleasant mood, this is not very suited for emotional generation. Then, there is also a problem of fixed size ``batch-like" generation with MuseGAN generating, effectively, several pieces of a music track divided in time and instruments and then concatenating them. And lastly, the usage of images as intermediaries causes the problem that each generation creates a noisy output, which then should be filtered.
+
+Some of these issues can be addressed with the use of sequential MIDI-like event encoding directly as input and output for the model, similarly to how text-to-text models such as ChatGPT work. This kind of models are derived from transformers architecture where a combination of encoder-decoders are used to learn the rules of the data representation through the use of attention mechanisms. Some of such models were created by Huang et al. \cite{huang} and Sulun et al. \cite{sulun} who proposed the usage of Music Transformer architecture capable or learning long-term structure of musical tracks.
+
+\section{Emotion Recognition}
+This section covers the inference of human emotions from EEG recordings in the context of regression task with goals of predicting the exact values of \gls{arousal} and \gls{valence} in a near real-time paradigm.
+
+\subsection{Dataset Description}
+
+We used a publicly available DEAP dataset described in paper \cite{deap}. The dataset consists of EEG recordings of 32 participants made while they listened to 40 music videos, with the label for each EEG recording being a sequence of 4 numbers from 1 to 9 which correspond to the participants rating of the listened musical track in terms of \gls{valence}, \gls{arousal}, dominance and likeness. This dataset is traditionally used for prediction of binary labels of \gls{valence} and \gls{arousal} (i.e. high / low arousal, high / low valence) but we, instead, use the \gls{valence} - \gls{arousal} variables in the regression context, so that the model learns to predict exact \gls{valence} and \gls{arousal} state.
+
+The EEG recordings consist of 63s length signals from 32 electrodes placed on the participant's head which generate 8064 datapoints at sampled at the rate of 128Hz. First three seconds of each recording constitute a baseline reading that is used to let the participant's mental state \emph{forget} the previous musical stimuli. The 32 electrodes are placed in accordance with 10-20 international system, and generate 32x8064 reading for each participants single trial. The dataset authors have also made some simple preprocessing with artifact removal and bandpass filtering of 4-45Hz for the sake of consitency between trials. 
+
+\subsection{Preprocessing and Feature Engineering}
+A number of previous studies on the dataset have shown that EEG data is too complex for current machine learning algorithms to process it in raw format, as experiments with models such CNN that used the direct values of EEG signals as input resulted in around 55-65\% mean accuracy in binary classification of \gls{valence} class when the model was trained and tested on the same, single participant. 
+
+Other approach that is often taken is the transformation of EEG recordings from time-domain to frequency-domain with Fourier transform, however the generic implementation of using frequency-wise and channel-wise power spectral density as feature vector leaves out the spatial information of each channel's signal correspondence to the brain activity. For this reason, we propose the following scheme for data processing feature engineering: 
+
+\begin{enumerate}[1)]
+    \item Crop the beginning and ending of the EEG recording, namely the first 24 seconds of the recording including the baseline, as well as the last 33 seconds for the resulting 6 second fragment used.
+    \item Generate channel-wise \acrshort{psd} using non-overlapping windows of one second length in 3 frequency bands.
+    \item Make topology-preserving sequence of multi-spectral images by interpolating \acrshort{psd} features based on distance between EEG electrodes.
+    \item Final features for the model input constitute a sequence of six 3-channel images, each corresponding to a one second of EEG recording and illustrating brain activity during this time period.
+\end{enumerate}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\textwidth]{images/fig1.png}
+\caption{Cropped EEG recording from a single electrode}
+\label{fig:eeg1}
+\end{figure}
+
+The purpose of the first step is the reduction of effects of mood-swing and impact, as well finding the balance between short time window that cannot capture the temporal nature of data and an overly long time window that is unsuitable for usage in a almost-realtime context. The EEG recording visualisation from a single channel obtained after this step can be seen on figure \ref{fig:eeg1}. We decided to use a manually set specific time window from timestep = $18s$ to timestep $24s$, as we thought at this point in time the participant has sufficiently evaluated the musical piece and their Valence/Arousal ranking is most representative for this period. By deliberately choosing not to generate additional samples by choosing different locations of window, we prevent the quality inflation that may appear as a result of generation of correlated, synthetic samples having the same label.
+
+The second step works with 6 parts of the cropped EEG recording obtained at step 1, and computes \acrfull{psd} for each one-second slice of EEG in all 32 electrodes. The used frequencies bands are illustrated in table \ref{table:1}.
+
+\begin{table}[h!]
+    \centering
+\begin{tabular}{|c|c|c|}
+\hline
+    Frequency Band & Low end, Hz & High end, Hz \\
+    \hline
+    Theta & 4 & 8 \\ 
+    Alpha & 8 & 16 \\ 
+    Beta-Gamma & 16 & 45 \\
+\hline
+\end{tabular}
+    \caption{Used frequency bands}
+    \label{table:1}
+\end{table}
+
+\begin{wrapfigure}{r}{0.35\textwidth}
+    \centering
+\includegraphics[width=0.35\textwidth]{images/fig3.png}
+\caption{Spectral topography map sampled from 1 second of EEG recording displayed on 28x28 grid}
+\label{fig:eeg3}
+\end{wrapfigure}
+
+Lastly, for each one second segment, we use the \acrshort{psd} vectors with 3-dimensional electrode positional encoding to create 2-dimensional spectral topography maps for each frequency band by interpolating on the values at the known 32 positions of the electrodes. The 2-dimensional electrode positions are obtained with use of topology-preserving azimuthal equidistant projection \cite{bashivan}. The resulting spectral topography maps have resolution of 28x28 and are illustrated on the figure \ref{fig:eeg3}, which are then combined into a sequence of 3-channel images that show brain activity at 6 points of time, with a single data point having shape <6, 3, 28, 28>.
+
+
+For prediction of continuous valued emotions we also propose reshaping the target features of \gls{valence} and \gls{arousal} from $[1, 9]^2 \subset \mathbb R^2$ to  $[-1, 1]^2 \subset \mathbb R^2$ by the following unconditional operation: $\tilde y = \frac{y - 5}{4}$. We chose this rather than a more traditional MinMax scaling or Standard scaling as we want the model to predict the emotional state in the uniform space, for a more clearer, understandable possible user query (e.g. \gls{valence} = -1 corresponds to the least valence for the models understanding).
+
+\subsection{Emotion Recognition Model}
+Based on the previous research, we found that both temporal and spatial features are vitally important for EEG-based emotion recognition. For this reason we propose a CNN-LSTM architecture designed specifically to capture both of these types of features with LSTM and CNN parts respectively, and its architecture is illustrated in listing \ref{lst:model} available in the appendix.
+
+The model is implemented with PyTorch framework \cite{pytorch} early stopping with saving best model is also applied to lower the training time, with the frameworks documentation available at \url{https://pytorch.org/}. Experiments with the model are conducted on each participant separately, with leave-one-out cross validation to estimate the true error rates to test the models ability to generalize between trials. 
+
+\section{Music Generation}
+This section describes the chosen approach for generating symbolic music conditioned on continuous-valued \gls{valence} and \gls{arousal} based on prior research by Huang et al. \cite{huang} and Sulun et al. \cite{sulun}
+
+\subsection{Dataset Description}
+For the creation of music generating model that had decent musical quality we required to use a substantial size dataset, for instance researchers from Google trained the Music Transformer with more than 10.000 hours of symbolic music \cite{huang}, which is much greater than most musical datasets with emotional labels can provide. This is why we employ the approach proposed by Sulun et al. \cite{sulun} by combining the size of Lakh Pianoroll dataset with emotional labels inferred from Spotify API, both of which are publicly available. In out previous work on music generation conditioned on emotions we used VGMIDI dataset, which consists of 204 labeled musical tracks (4 categories), while Lakh dataset consists of 174270 unlabeled tracks, and with Spotify API 34791 musical tracks can be matched to valence emotional label, with arousal feature being substituted with note-density \cite{sulun} which was shown to be an adequate solution. Usage of such dataset is motivated with the possibility of using extremely large quantities of musical tracks for the training, far greater then other contemporary datasets with emotional labelling such as VGMidi \cite{vgmidi} and EMOPIA \cite{emopia}.  
+
+To capture the long-term structure of music we decided on using sequential-events music representation, where music is encoded as a sequence of events of 4 types, namely:
+\begin{enumerate}
+    \item \textsc{note\_on}$(x)$ for pressing the note at pitch $x$ (88 pitches, 5 instruments)
+    \item \textsc{note\_off}$(x)$ for releasing the note at pitch $x$  (88 pitches, 5 instruments)
+    \item \textsc{time\_shift}$(x)$ for shifting the time axis by $x$ ms. (125 evenly spaced values from 8 to 1000)
+    \item utility tokens: \textsc{<START>} and \textsc{<PAD>}, used to indicate the beginning of a piece and to pad the piece when necessary.
+\end{enumerate}
+For instruments, continuing the tradition we used 5 usual instruments: guitar, bass, drums, piano and strings, each possible to play at 88 pitches out of 128 pitches in MIDI format, excluding pitches lower than 21 and higher than 108 which are inaudible with most soundfonts.
+
+\subsection{Generating Model}
+As was stated previously, the Transformer model uses a vocabulary of 4 types of events, constituting a vocabulary of 1007 unique word-level tokens, combination of which make up a MIDI file, which then can be played as a musical piece. As input, the model takes in the a 1216 length-input sequence of vectors with feature dimension 768, comprised of sinusoidal relative position embeddings and conditioning variables based on \gls{valence} and \gls{arousal}. 
+
+
+In regards to the specifics of input data, we use sinusoidal positional encoding presented in the paper \emph{Attention is all you need} by Vaswani et al. \cite{attention}, which is described with equations 
+$$
+{\overrightarrow{p_t}}^{(i)}=f(t)^{(i)}:= \begin{cases}\sin \left(\omega_k \cdot t\right), & \text { if } i=2 k \\ \cos \left(\omega_k \cdot t\right), & \text { if } i=2 k+1\end{cases}
+$$
+,where 
+$$
+\omega_k=\frac{1}{10000^{2 k / d}}
+$$
+which are added to the word tokens to preserve the information regarding the relative position between them.
+
+Similarly, the model also utilizes Relative Positional Self-Attention mechanism introduced by Shaw et al. \cite{shaw}, which allows the model to inform the distance between two positions in a sequence. However, the approach presented in Shaw et al. (2018) \cite{shaw} has a serious limitation on the input sequence size, as it has quadratic memory complexity, as for each attention head, an embedding containing relative distance between all queries and keys is constructed. For this reason, we implement the mechanism described in Huang et al. (2018) \cite{huang} for relative positional attention.
+
+Lastly, the model itself, consists of stacked decoder layers described in Vaswani et al. \cite{attention}, with model source code available at the appendix.
+
+\subsection{Training overview}
+The model solves the problem of predicting the next token in the sequence, as such a generation of a piece of 4096 tokens requires 4096 forward passes of the model, however, by setting the such problem it is possible to make an unending flow of predictions, and thus, music. Overall, the model training is split into two phases: a pretraining on unlabelled part of the dataset, and the latter finetuning with the matched with Spotify API part of dataset. Thus, the training pipeline, consists of taking a fixed-size chunk of music, applying positional sinusoidal encoding, concatenating with conditioning variables (if any), and model fit in the context of predicting next token.  
+
+During the pretraining, the models input constitute a sequence of 1216 tokens, which are used to obtain 768-dimensional word embeddings, which are used to train the model. After this step, the trained model is capable of generating instrumental music with sufficient quality, however it lacks conditioning ability. For this purpose, after training the model on unconditional data samples, when it successfully learnt the underlying musical structure we begin the process of finetuning, where the model studies the relationship between emotions and instrumental music.
+
+For the finetuning of the pretrained model, we change the procedure how create the features for the neural network. Instead of creating 768-dimensional word embeddings, we only make the first 576 feature dimensions by transferring of the pretrained weights onto a separate model, and concatenate the resulting vectors with the additional 192-dimensional conditioning embedding. This embedding is obtained from a repeated to match the input-sequence shape 192-valued vector, that serves as an embedding for the input \gls{valence} and \gls{arousal}, resulted from a pass through a fully connected linear layer, thus the resulting feature dimensions remain 768, allowing for the finetuning. The word-embeddings are then passed into sinusoidal positional encoding and fed into the neural network, with the only difference between pretraining and finetuning being word-embedding procedure, with everything else remaining the same.
+
+\section{EEG Experiment}
+\subsection{Objective}
+To test the developed recognition-generation models we decided to get access to EEG equipment and make additional DEAP-like samples in Skolkovo Institute of Science and Technology laboratory. The goal of the experiment was to have an individual listen to several tracks, both generated by a machine and written by a human, and evaluate them based on perceived \gls{valence} and \gls{arousal} measures, with an accompanying EEG recording for later processing and evaluation of generation and recognition models.
+
+\subsection{Procedure}
+For the experiment, we selected 16 audio tracks from 40 presented in DEAP dataset, that were emotionally diverse, according to average response from DEAP participants, and 16 audio tracks from the generating model, half of which were taken from the during the latter half of the training procedure and half were generated after the training was completed Then, for the consistency between all samples, we converted the musical tracks in DEAP to instrumental versions by playing the corresponding MIDI file instead. All tracks were limited to 30 seconds, which were human-selected, to either match DEAP highlight-begin, or to match a generated piece highlight, and played on the same soundfont. The detailed overview of the selected audio tracks and the audio samples played during experiment, as well as the soundfont used are available at the paper appendix.
+
+\begin{wrapfigure}{l}{0.35\textwidth}
+    \centering
+\includegraphics[width=0.35\textwidth]{images/10-20.png}
+\caption{10-20 electrode placement scheme used in the trial}
+\label{fig:eeg4}
+\end{wrapfigure}
+The trial was conducted as follows: the subject was equiped with an EEG device mounted with the same scheme as in DEAP dataset with 32 electrodes places in 10-20 system illustrated figure \ref{fig:eeg4}, after that 32 musical tracks were played in random order, with the subject asked to evaluate the perceived \gls{valence} and \gls{arousal} evoked from the music played. In between the start of each EEG recording and start of music we introduced a 5 second gap to limit the emotional overflow from prior recordings. For consistency between the held trial and training and evaluation on DEAP dataset, only timesteps from $18s$ to $24s$ were used for recognition model inference.
+
+
+\section{Overview of results}\label{section:res}
+\subsection{Emotion Recognition}
+
+The proposed model for emotional recognition is a valid solution for predicting exact values of \gls{valence} and \gls{arousal} in the context of same-subject generalisation, with experiments conducted on 32 participants presented in the DEAP dataset, with leave-one-out trial cross-validation we achieved the mean squared error for prediction of valence and arousal labels, with domain from -1 to 1 of 0.276 and 0.213 for both labels respectively. Similarly, we also evaluated the model in the context of binary classification and with resulting accuracy on the level, similar to state-of-the-art solutions excluding studies with generation of highly-correlated samples that lead to over-estimated accuracy. The detailed results can be observed at table \ref{table:2}.
+
+\begin{table}[h!]
+    \centering
+\begin{tabular}{|r |c |c|}
+\hline
+    Variable &MSE & Binary Accuracy \\
+    \hline
+    Valence & $0.2726$ & $0.5750$ \\ 
+    Arousal & $0.2274$ & $0.6258$ \\ 
+\hline
+\end{tabular}
+    \caption{Leave-one-out CV results}
+    \label{table:2}
+\end{table}
+
+\subsection{Music Generation}
+Resulting music generation model, subjectively, produces satisfactory in quality and like-ability pieces of music with distinct qualities based on input target valence and arousal, especially in regards to the arousal variables. The model can be used to generate music, however we found that the current implementation is too inefficient for use in on-line scenario and it requires further work. For instance, it is possible to apply knowledge-distillation to reduce the time needed for a forward pass or to train the model under a different problem, so that its single forward pass allows to obtain not a next token but a greater piece in size.
+
+Quality of the generated music can be personally examined by accessing a Google Drive with examples of both the randomly selected generated pieces as well as instrumental pieces from DEAP that were used during the EEG experiment, a link to which is places at the paper appendix.
+
+\subsection{EEG Experiment}
+By examining the responses of the experiment's participant we found that model in general can be successful in generating the music in according to the desired \gls{valence}, \gls{arousal} and at rare instances can even ``fool" an individual, so that they think it is not a generated piece but a music written by a human.  However, the tracks still can be detected as synthetic due to several factors such as too long/short ``phrases" (this term is used loosely, rather than the actual definition of music theory), overuse of similar notes, rapid change of instruments and etc. This, we believe, can influence how a listener perceives emotions of a piece. 
+
+Moreover, there is a substantial possibility of influence a soundfont can have on the perceived emotions, as it can be difficult to play a heavy metal song on instruments tuned for an orchestra and vice-versa, with a single track played under a slight shift in pitch or tempo corresponding to drastically different conveyed emotions.
+
+
+Overall, when comparing the differences between valence and arousal estimates given by the average response in DEAP and in our experiment participant, for both measures the absolute difference is less than  0.55 in 3 out of 4 cases, while for the difference between the participant's estimate and the prompt given to generating model, we found that this difference was, on average, quite higher with only half of tracks achieving difference under 0.4 for \gls{arousal} and 0.6 for \gls{valence}. We explain this by the effects of the extreme values set for the generating model, with tracks generated at points that have either 0.8 or -0.8 for both measures. For extreme outliers, we conducted an additional self-reported hearing with confirmation that the tracks could indeed be matched to both extremes of valence with corresponding emotions best described as 'tense' or 'astonished'. Additionally, on the given small number of observations, the binary accuracy of desired elicitated emotion (high / low) is $0.625$ for valence and $0.75$ for arousal, with absolute errors of desired emotion against the ground-truth are illustrated on figure \ref{fig:error} with differences between DEAP dataset and participant presented for the sake of comparison.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/fig4.png}
+    \caption{Color-coded boxplots of absolute differences between participant responses and estimates based on generator input and average response taken from DEAP dataset}
+    \label{fig:error}
+\end{figure}
+In general, we observed that model-generated music is less suitable to evoke a specific emotions that human-written, however, it still can be used for this goals, with arousal elicitation being almost on-par with human-written music. Relative poor performance of model in terms of valence, can be explained by the underfit of the model, the extremeness of prompted values of arousal and valence being either 0.8, -0.8 and 0, while DEAP estimates have much smaller range of variation, with effective domain size of 1.2 (from -0.6 to 0.6) rather than 1.8 for the generated pieces, and possible bad choice of the initial dataset based on Spotify's valence measure. Additional Visualisation of the data obtained during the experiment is located in the appendix.
+
+\section{Conclusion and Future work}
+The developed combination of emotion recognition and emotion-aware music generation can be considered a proof of concept that continually-defined emotions are suitable for music generation, with possibility for generation of quite complex music that at times can rival human-written instrumental music that can evoke desired emotions. However, the current implementation has several flaws that can be fixed given time, for instance:
+\begin{itemize}
+ \item Suboptimal quality of emotion recognition, although, many SOTA solutions on DEAP dataset fall into 60\% accuracy for binary classes of \gls{valence} and \gls{arousal}, which may indicate not ideal quality of the dataset, thus the prediction quality can be improved by training on larger, more recently developed datasets.
+ 
+ \item Low speed of music generation, that can be tackled by knowledge distillation and other means of optimisation, or a shift in problem statement for musical generation model from next-token prediction to a more suited one.
+ 
+ \item Possibility for improvements in generating model training, e.g. data augmentation for enlargement of the effective dataset and longer training, with consequent improvement in overall quality and complexity, as well as more a impactful conditional input.
+ 
+ \item Larger sample size for generating model evaluation, with more realistic input variables, having greater resemblance with the chosen human-written music in terms of \gls{valence} and \gls{arousal} for better approximation of the model quality.
+\end{itemize}
+
+\section{Acknowledgement}
+We thank colleagues from Skolkovo Institute of Technology for providing equipment and instructions for setting up the EEG experiment at the universities premises, with special thanks to Alexandra Razorenova who consulted us throughout the whole experiment. 
+
+We extend out gratitude to the team behind DEAP dataset, with Dr. Ioannis Patras, who provided access to the dataset.
+
+\section{Appendix} \label{section:app}
+
+\begin{lstlisting}[language=Python, caption=CNN-LSTM architecture, label={lst:model}]
+class CNN_LSTM(nn.Module):
+    def __init__(self, num_classes):
+        super(CNN_LSTM, self).__init__()
+        self.norm = nn.LayerNorm([28, 28])
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.dropout = nn.Dropout(p=0.5)
+        self.lstm = nn.LSTM(input_size=1152, hidden_size=128, num_layers=3, dropout=0.3, batch_first=True)
+        self.fc1 = nn.Linear(128, 32)
+        self.fc2 = nn.Linear(32, num_classes)
+
+    def forward(self, x):
+        batch_size, seq_length, channels, height, width = x.size()
+        c_in = x.view(batch_size * seq_length, channels, height, width)
+
+        c_out = self.pool(self.dropout(nn.functional.relu(self.conv1(c_in))))
+        c_out = self.pool(self.dropout(nn.functional.relu(self.conv2(c_out))))
+        c_out = self.pool(self.dropout(nn.functional.relu(self.conv3(c_out))))
+
+        r_in = c_out.view(batch_size, seq_length, -1)
+        r_out, _ = self.lstm(r_in)
+        r_out = r_out[:, -1, :]  # Take the output of the last time step
+
+        fc1_out = self.dropout(nn.functional.relu(self.fc1(r_out)))
+        fc2_out = self.fc2(fc1_out)
+
+        return fc2_out
+\end{lstlisting}
+\subsection{Project Repositories}
+\begin{itemize}
+    \item Github repository with analytics and EEG emotion recognition \\
+    {\small \url{https://github.com/Olenek/eeg-recognizer}}
+    \item Github repository with music generation pipeline \\
+    {\small \url{https://github.com/Olenek/emotion-music}}
+\end{itemize}
+\subsection{Music Samples}
+Google Drive containing samples of generated music as well as examples of music used in inference experiment \\
+{\small \url{https://drive.google.com/drive/folders/10skII0RwjPPN1OevwUWFJKEbB5-2huHz?usp=drive_link}}
+\subsection{Music Generation inferrence results}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{images/fig-deap1.png}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{images/fig-deap2.png}
+\end{figure}
+\clearpage
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{images/fig-gen1.png}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{images/fig-gen2.png}
+\end{figure}
+% \subsection{SoundCloud Playlist}
+% \url{https://soundcloud.com/anton-ivanov-512802841/sets/emotiongan}
+
+\begin{thebibliography}{20}
+\bibitem{midj}
+Oppenlaender, J. (2022, October 31). The creativity of text-to-image generation. arXiv.org. https://arxiv.org/abs/2206.02904 
+\bibitem{stable}
+Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B. (2022, April 13). High-resolution image synthesis with Latent Diffusion Models. arXiv.org. https://arxiv.org/abs/2112.10752 
+\bibitem{depression}
+Gebhardt, S., Dammann, I., Loescher, K., Wehmeier, P. M., Vedder, H., von Georgi, R. (2018). The effects of music therapy on the interaction of the self and emotions—an interim analysis. Complementary Therapies in Medicine, 41, 61–66. https://doi.org/10.1016/j.ctim.2018.08.014
+
+\bibitem{ekman}
+Ekman, P., Sorenson, E.R., Friesen, W.V. Pan-cultural elements in facial displays of emotions. Science 1969,
+164, 86–88.
+
+\bibitem{many}
+Cowen, A. S., Keltner, D. (2017). Self-report captures 27 distinct categories of emotion bridged by continuous gradients. Proceedings of the National Academy of Sciences of the United States of America, 114(38), E7900-E7909. doi:10.1073/pnas.1702247114
+
+\bibitem{russel}
+Russell, J.A. A circumplex model of Affect. J. Personal. Soc. Psychol. 1980, 39, 1161–1178. 
+
+
+\bibitem{nawaz}
+Nawaz, R., Cheah, K. H., Nisar, H., Yap, V. V. (2020). Comparison of different feature extraction methods for EEG-based emotion recognition. Biocybernetics and Biomedical Engineering, 40(3), 910-926. doi:10.1016/j.bbe.2020.04.005
+
+\bibitem{deap}
+Koelstra, S., Mühl, C., Soleymani, M., Lee, J. -., Yazdani, A., Ebrahimi, T., Patras, I. (2012). DEAP: A database for emotion analysis; using physiological signals. IEEE Transactions on Affective Computing, 3(1), 18-31. doi:10.1109/T-AFFC.2011.15
+
+\bibitem{yimin}
+Hou, Y., Chen, S. (2019). Distinguishing different emotions evoked by music via electroencephalographic signals. Computational Intelligence and Neuroscience, 2019 doi:10.1155/2019/3191903 
+
+\bibitem{zhang}
+Zhang, Y., Ji, X., Zhang, S. (2016). An approach to EEG-based emotion recognition using combined feature extraction method. Neuroscience Letters, 633, 152-157. doi:10.1016/j.neulet.2016.09.037
+
+\bibitem{bhatti}
+Bhatti, A. M., Majid, M., Anwar, S. M., Khan, B. (2016). Human emotion recognition and analysis in response to audio music using brain signals. Computers in Human Behavior, 65, 267-275. doi:10.1016/j.chb.2016.08.029
+
+\bibitem{bashivan}
+Bashivan, P., Bidelman, G. M., Yeasin, M. (2014). Spectrotemporal dynamics of the EEG during working memory encoding and maintenance predicts individual behavioral capacity. European Journal of Neuroscience, 40(12), 3774–3784. https://doi.org/10.1111/ejn.12749
+
+\bibitem{galvao}
+Galvão, F., Alarcão, S. M., Fonseca, M. J. (2021). Predicting exact valence and arousal values from EEG. Sensors, 21(10), 3414. https://doi.org/10.3390/s21103414 
+
+\bibitem{leslie}
+Leslie, G., Ghandeharioun, A., Zhou, D. Y., Picard, R. W. (2019). Engineering Music to Slow Breathing and Invite Relaxed Physiology. In 2019 8th International Conference on Affective Computing and Intelligent Interaction (ACII) pp. 1-7 doi: 10.1109/ACII.2019.8925531.
+
+\bibitem{musegan}
+Dong. H., Hsiao, W., Yang, L., Yang, Y. (2017) MuseGAN: Multi-track Sequential Generative Adversarial Networks for Symbolic Music Generation and Accompaniment.
+doi: 10.48550/ARXIV.1709.06298
+\bibitem{pytorch}
+Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., … Chintala, S. (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. In Advances in Neural Information Processing Systems 32 (pp. 8024–8035). Curran Associates, Inc. Retrieved from http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf
+\bibitem{huang}
+Huang, C.-Z. A., Vaswani, A., Uszkoreit, J., Shazeer, N., Simon, I., Hawthorne, C., Dai, A. M., Hoffman, M. D., Dinculescu, M., Eck, D. (2018, December 12). Music transformer. arXiv.org. Retrieved April 25, 2023, from https://arxiv.org/abs/1809.04281 
+
+\bibitem{sulun}
+Sulun, S., Davies, M. E., Viana, P. (2022). Symbolic music generation conditioned on continuous-valued emotions. IEEE Access, 10, 44617–44626. https://doi.org/10.1109/access.2022.3169744 
+
+\bibitem{vgmidi}
+Ferreira, L. N., Whitehead, J. (2019) Learning to Generate Music with Sentiment. In ISMIR'19 Proceedings of the Conference of the International Society for Music Information Retrieval. 
+
+\bibitem{emopia}
+Hung, H., Ching, J., Doh, S., Kim, H., Nam, J., Yang, Y., (2021).
+EMOPIA: A Multi-Modal Pop Piano Dataset For Emotion Recognition and Emotion-based Music Generation. In ISMIR'21, arXiv:2108.01374
+
+\bibitem{attention}
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., Polosukhin, I. (2017, December 6). Attention is all you need. arXiv.org. https://arxiv.org/abs/1706.03762 
+
+\bibitem{shaw}
+Shaw, P., Uszkoreit, J., Vaswani, A. (2018, April 12). Self-attention with relative position representations. arXiv.org. https://arxiv.org/abs/1803.02155 
+\end{thebibliography}
+
+\end{document}
