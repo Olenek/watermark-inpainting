@@ -1,0 +1,7 @@
+.python-version
+.ipynb_checkpoints
+.ipynb_checkpoints/
+data/
+
+.idea
+.idea/
