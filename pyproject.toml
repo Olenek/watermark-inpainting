@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "thesis"
+version = "0.1.0"
+description = ""
+authors = ["Anton Ivanov <apivanov@avito.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+tqdm = "^4.67.1"
+numpy = "^2.2.4"
+pandas = "^2.2.3"
+rarfile = "^4.2"
+gdown = "^5.2.0"
+jupyter = "^1.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
