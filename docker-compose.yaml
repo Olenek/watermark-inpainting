@@ -1,0 +1,19 @@
+name: watermark_removal_$USER
+version: '2.3'
+services:
+  jupyter:
+#    image: watermark_removal:$USER
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DEV: true
+    container_name: watermark_removal_$USER
+    ports:
+      - "8188:8088"
+    volumes:
+      - ./:/app
+    ipc: host
+    shm_size: 8G
+    command: nohup jupyter lab --allow-root --ip=0.0.0.0 --port=8088
+    restart: unless-stopped
