@@ -14,7 +14,14 @@ pandas = "^2.2.3"
 rarfile = "^4.2"
 gdown = "^5.2.0"
 jupyter = "^1.1.1"
+torch = { version = "2.4.1+cu118", source = "torchcu118" }
+pytest = "^8.3.5"
+einops = "^0.8.1"
 
+[[tool.poetry.source]]
+name = "torchcu118"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]
