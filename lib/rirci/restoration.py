@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from lib.rirci.glci import GLCIBlock
+from lib.rirci.glci.glci import GLCI, GLCIStack
 
 
 class FusionModule(nn.Module):
@@ -18,56 +18,59 @@ class FusionModule(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-
-
-class RestorationBranch(nn.Module):
-    """
-    Content Restoration Sub-network
-    Input: torch.Tensor of shape (B, 4, H, W) [C_b || M_hat]
-    Output: torch.Tensor of shape (B, 3, H, W) - restored image I_r
-    """
-    def __init__(self, glci_channels=64):
-        super().__init__()
-        self.encoder = nn.Sequential(
-            nn.Conv2d(4, glci_channels, 3, padding=1),
-            nn.ReLU(inplace=True)
-        )
-        self.glci = GLCIBlock(glci_channels)
-        self.decoder = nn.Sequential(
-            nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(glci_channels, 3, 1)  # Output RGB
-        )
-
-    def forward(self, cb_mask_concat):
-        x = self.encoder(cb_mask_concat)
-        x = self.glci(x)
-        return self.decoder(x)
-
-
-class ImaginationBranch(nn.Module):
-    """
-    Content Imagination Sub-network
-    Input: torch.Tensor of shape (B, 4, H, W) [(1 - M_hat) * J || M_hat]
-    Output: torch.Tensor of shape (B, 3, H, W) - imagined image I_i
-    """
-    def __init__(self, glci_channels=64):
-        super().__init__()
-        self.encoder = nn.Sequential(
-            nn.Conv2d(4, glci_channels, 3, padding=1),
-            nn.ReLU(inplace=True)
-        )
-        self.glci = GLCIBlock(glci_channels)
-        self.decoder = nn.Sequential(
-            nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(glci_channels, 3, 1)
-        )
-
-    def forward(self, masked_input):
-        x = self.encoder(masked_input)
-        x = self.glci(x)
-        return self.decoder(x)
+#
+# class RestorationBranch(nn.Module):
+#     """
+#     Content Restoration Sub-network
+#     Input: torch.Tensor of shape (B, 4, H, W) [C_b || M_hat]
+#     Output: torch.Tensor of shape (B, 3, H, W) - restored image I_r
+#     """
+#     def __init__(self, glci_channels=64):
+#         super().__init__()
+#         self.encoder = nn.Sequential(
+#             nn.Conv2d(4, glci_channels, 3, padding=1),
+#             nn.ReLU(inplace=True)
+#         )
+#         self.glci_1 = GLCI(glci_channels)
+#         self.glci_2 = GLCI(glci_channels)
+#         self.glci_3 = GLCI(glci_channels)
+#         self.glci_4 = GLCI(glci_channels)
+#         self.glci_5 = GLCI(glci_channels)
+#         self.decoder = nn.Sequential(
+#             nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
+#             nn.ReLU(inplace=True),
+#             nn.Conv2d(glci_channels, 3, 1)  # Output RGB
+#         )
+#
+#     def forward(self, cb_mask_concat):
+#         x = self.encoder(cb_mask_concat)
+#         x = self.glci(x)
+#         return self.decoder(x)
+#
+#
+# class ImaginationBranch(nn.Module):
+#     """
+#     Content Imagination Sub-network
+#     Input: torch.Tensor of shape (B, 4, H, W) [(1 - M_hat) * J || M_hat]
+#     Output: torch.Tensor of shape (B, 3, H, W) - imagined image I_i
+#     """
+#     def __init__(self, glci_channels=64):
+#         super().__init__()
+#         self.encoder = nn.Sequential(
+#             nn.Conv2d(4, glci_channels, 3, padding=1),
+#             nn.ReLU(inplace=True)
+#         )
+#         self.glci = GLCIStack(glci_channels, n_blocks=3)
+#         self.decoder = nn.Sequential(
+#             nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
+#             nn.ReLU(inplace=True),
+#             nn.Conv2d(glci_channels, 3, 1)
+#         )
+#
+#     def forward(self, masked_input):
+#         x = self.encoder(masked_input)
+#         x = self.glci(x)
+#         return self.decoder(x)
 
 
 class RIRCIStage2(nn.Module):
@@ -86,19 +89,56 @@ class RIRCIStage2(nn.Module):
     """
     def __init__(self, glci_channels=64):
         super().__init__()
-        self.restoration = RestorationBranch(glci_channels)
-        self.imagination = ImaginationBranch(glci_channels)
+
+        self.r_encoder = nn.Sequential(
+            nn.Conv2d(4, glci_channels, 3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        self.r_glci_0 = GLCI(glci_channels)
+        self.r_glci_1 = GLCI(glci_channels)
+        self.r_glci_h = GLCIStack(glci_channels, n_blocks=2)  # hidden
+        self.r_glci_f = GLCI(glci_channels)  # final block
+        self.r_decoder = nn.Sequential(
+            nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(glci_channels, 3, 1)
+        )
+
+        self.i_encoder = nn.Sequential(
+            nn.Conv2d(4, glci_channels, 3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        self.i_glci_1 = GLCI(glci_channels)
+        self.i_glci_2 = GLCI(glci_channels)
+        self.i_glci_h = GLCIStack(glci_channels, n_blocks=2)
+        self.i_glci_o = GLCI(glci_channels)
+        self.i_decoder = nn.Sequential(
+            nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(glci_channels, 3, 1)
+        )
+
         self.fusion = FusionModule(in_channels=3 + 3 + 1)  # I_r, I_i, M_hat
 
     def forward(self, J, M_hat, C_b):
         # Content Restoration Sub-network
         cb_mask = torch.cat([C_b, M_hat], dim=1)  # (B, 4, H, W)
-        I_r = self.restoration(cb_mask)
+        x = self.r_encoder(cb_mask)
+        r_0 = self.r_glci_0(x)
+        r_1 = self.r_glci_1(r_0)
+        r_h = self.r_glci_h(r_1)
+        r_f = self.r_glci_f(r_h) + r_1 # Skip from R. GLCI_2 → R. GLCI_F
+        I_r = self.r_decoder(r_f)
 
         # Content Imagination Sub-network
         J_masked = (1 - M_hat) * J
         input_imagine = torch.cat([J_masked, M_hat], dim=1)
-        I_i = self.imagination(input_imagine)
+        x = self.i_encoder(input_imagine)
+        i_0 = self.i_glci_1(x) + r_0 # Skip from R. GLCI_1 → I. GLCI_1
+        i_1 = self.i_glci_2(i_0) + r_1 # Skip from R. GLCI_1 → I. GLCI_1
+        i_h = self.i_glci_h(i_1)
+        i_o = self.i_glci_o(i_h) + i_1 # Skip from R. GLCI_1 → I. GLCI_1
+        I_i = self.i_decoder(i_o)
 
         # Fusion
         fusion_input = torch.cat([I_r, I_i, M_hat], dim=1)

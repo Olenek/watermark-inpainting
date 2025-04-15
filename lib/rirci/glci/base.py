@@ -73,7 +73,14 @@ class LocalMLP(nn.Module):
         x = rearrange(x, '(b n) c p -> b c n p', b=B)
 
         # Reverse rearrangement
-        x = rearrange(x, 'b c (h w) p -> b c h w', h=H // self.patch_size, w=W // self.patch_size)
+        x = rearrange(
+            x,
+            'b c (h w) (p1 p2) -> b c (h p1) (w p2)',
+            h=H // self.patch_size,
+            w=W // self.patch_size,
+            p1=self.patch_size,
+            p2=self.patch_size
+        )
         return x
 
 
