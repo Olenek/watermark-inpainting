@@ -41,12 +41,6 @@ class RIRCIStage1(nn.Module):
         x4 = self.enc3(x3) # 512, 32x32
         x5 = self.enc4(x4)  # 1024, 16x16
 
-        print('x1: ', x1.shape)
-        print('x2: ', x2.shape)
-        print('x3: ', x3.shape)
-        print('x4: ', x4.shape)
-        print('x5: ', x5.shape)
-
         # Decoder
         x = self.up4(x5, x4)  # 512, 32x32
         x = self.up3(x, x3)  # 256, 64x64

@@ -18,14 +18,18 @@ COPY pyproject.toml poetry.lock $PROJECT_ROOT/
 # Install dependencies
 RUN poetry config virtualenvs.create false && poetry install --no-cache --no-root
 
-# Copy the rest of the project files
-COPY . $PROJECT_ROOT
+# Copy only the necessary project files (excluding data)
+COPY lib/ $PROJECT_ROOT/lib/
+COPY bin/ $PROJECT_ROOT/bin/
+COPY tests/ $PROJECT_ROOT/tests/
 
 # Set the PYTHONPATH environment variable
 ENV PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
 
-## Expose the port for Jupyter Notebook (if needed)
-#EXPOSE 8888
-#
-## Run Jupyter Notebook or any other command you need
-#CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--allow-root", "--no-browser", "--notebook-dir=/app/notebooks"]
+# Create a directory where the data will be mounted
+RUN mkdir -p /data
+
+# Set the working directory (optional)
+WORKDIR $PROJECT_ROOT
+
+# Add any other necessary configurations

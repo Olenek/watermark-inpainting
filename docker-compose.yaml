@@ -2,7 +2,6 @@ name: watermark_removal_$USER
 version: '2.3'
 services:
   jupyter:
-#    image: watermark_removal:$USER
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,8 +11,30 @@ services:
     ports:
       - "8188:8088"
     volumes:
-      - ./:/app
+      - ./:/app  # Mounts entire project for code changes
+      - ./data:/data  # Mounts dataset directory
+      - ./notebooks:/app/notebooks  # Persistent notebooks
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - DATA_PATH=/data  # Environment variable for dataset path
     ipc: host
     shm_size: 8G
-    command: nohup jupyter lab --allow-root --ip=0.0.0.0 --port=8088
+    command: nohup jupyter lab --allow-root --ip=0.0.0.0 --port=8088 --NotebookApp.token='' --NotebookApp.password=''
     restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  jupyter_data:  # Named volume for Jupyter configuration
+    driver: local
+  watermark_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data

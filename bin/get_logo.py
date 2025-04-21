@@ -1,8 +1,10 @@
-from tqdm import tqdm
-from huggingface_hub import hf_hub_download
-import zipfile
 import os
-import shutil
+import zipfile
+
+from PIL import Image
+from huggingface_hub import hf_hub_download
+from tqdm import tqdm
+
 
 def extract_zip(zip_path, extract_to):
     os.makedirs(extract_to, exist_ok=True)
@@ -10,61 +12,63 @@ def extract_zip(zip_path, extract_to):
         zip_ref.extractall(extract_to)
 
 
-def extract_base_name(filename):
-    # From 'image-watermark-001.png' => 'image.png'
+def extract_coco_val_name(filename):
+    # From 'COCO_val2014_000000290451-Gant_Logo-159.png' => 'COCO_val2014_000000290451.jpg'
     return filename.split("-")[0] + ".jpg"
 
 
-def collect_target_filenames(wm_dir):
-    filenames = os.listdir(wm_dir)
-    base_names = set()
+def collect_target_filenames(image_dir):
+    filenames = os.listdir(image_dir)
+    target_names = list()
     for f in filenames:
-        if f.endswith(".png") or f.endswith(".jpg"):
-            base_names.add(extract_base_name(f))
-    return base_names
+        target_names.append(extract_coco_val_name(f))
+    return filenames, target_names
 
 
 def prepare_targets(dataset: str):
-    natural_dir, train_wm_dir, val_wm_dir = (
+    natural_dir, train_dir, val_dir = (
         f'data/{dataset}/natural',
         f'data/{dataset}/train_images',
         f'data/{dataset}/val_images',
     )
 
     # Paths to final destination
-    train_target_dir = os.path.join(train_wm_dir, "target")
-    val_target_dir = os.path.join(val_wm_dir, "target")
+    train_target_dir = os.path.join(train_dir, "target")
+    val_target_dir = os.path.join(val_dir, "target")
 
     os.makedirs(train_target_dir, exist_ok=True)
     os.makedirs(val_target_dir, exist_ok=True)
 
     # Get needed target image names
-    train_targets = collect_target_filenames(os.path.join(train_wm_dir, 'image'))
-    val_targets = collect_target_filenames(os.path.join(val_wm_dir, 'image'))
+    train_wm_names, train_target_names = collect_target_filenames(os.path.join(train_dir, 'image'))
+    val_wm_names, val_target_names = collect_target_filenames(os.path.join(val_dir, 'image'))
 
     moved_train = 0
     moved_val = 0
 
-    for fname in train_targets:
-        src = str(os.path.join(natural_dir, fname))
-        dst = str(os.path.join(train_target_dir, fname))
+    # noinspection DuplicatedCode
+    for wm_name, target_name in tqdm(zip(train_wm_names, train_target_names), total=len(train_wm_names)):
+        src = str(os.path.join(natural_dir, target_name))
+        dst = str(os.path.join(train_target_dir, wm_name))
         if os.path.exists(src) and not os.path.exists(dst):
-            shutil.move(src, dst)
+            Image.open(src).save(dst)
             moved_train += 1
 
-    for fname in val_targets:
-        src = str(os.path.join(natural_dir, fname))
-        dst = str(os.path.join(val_target_dir, fname))
+    # noinspection DuplicatedCode
+    for wm_name, target_name in tqdm(zip(val_wm_names, val_target_names), total=len(val_wm_names)):
+        src = str(os.path.join(natural_dir, target_name))
+        dst = str(os.path.join(val_target_dir, wm_name))
         if os.path.exists(src) and not os.path.exists(dst):
-            shutil.move(src, dst)
+            Image.open(src).save(dst)
             moved_val += 1
 
     print(f"✅ Copied {moved_train} train targets and {moved_val} val targets.")
 
+
 datasets = [
-    '10kgray',
-    '10khigh',
-    '10kmid',
+    # '10kgray',
+    # '10khigh',
+    # '10kmid',
     '27kpng',
 ]
 files = [f'{dataset}.zip' for dataset in datasets]
