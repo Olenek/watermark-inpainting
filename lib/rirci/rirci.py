@@ -2,6 +2,8 @@ import torch.nn as nn
 
 from lib.rirci.exclusion import RIRCIStage1
 from lib.rirci.restoration import RIRCIStage2
+from lib.slbr.resunet import SLBR
+
 
 class RIRCIModel(nn.Module):
     """
@@ -19,10 +21,10 @@ class RIRCIModel(nn.Module):
     """
     def __init__(self):
         super().__init__()
-        self.stage1 = RIRCIStage1()
+        self.stage1 = SLBR(shared_depth=1, blocks=3, long_skip=False)
         self.stage2 = RIRCIStage2()
 
     def forward(self, J):
-        M_hat, C_b = self.stage1(J)
+        C_b, M_hat = self.stage1(J)
         I_r, I_i, I_hat = self.stage2(J, M_hat, C_b)
         return M_hat, C_b, I_r, I_i, I_hat

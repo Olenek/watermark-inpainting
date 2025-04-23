@@ -18,60 +18,6 @@ class FusionModule(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-#
-# class RestorationBranch(nn.Module):
-#     """
-#     Content Restoration Sub-network
-#     Input: torch.Tensor of shape (B, 4, H, W) [C_b || M_hat]
-#     Output: torch.Tensor of shape (B, 3, H, W) - restored image I_r
-#     """
-#     def __init__(self, glci_channels=64):
-#         super().__init__()
-#         self.encoder = nn.Sequential(
-#             nn.Conv2d(4, glci_channels, 3, padding=1),
-#             nn.ReLU(inplace=True)
-#         )
-#         self.glci_1 = GLCI(glci_channels)
-#         self.glci_2 = GLCI(glci_channels)
-#         self.glci_3 = GLCI(glci_channels)
-#         self.glci_4 = GLCI(glci_channels)
-#         self.glci_5 = GLCI(glci_channels)
-#         self.decoder = nn.Sequential(
-#             nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
-#             nn.ReLU(inplace=True),
-#             nn.Conv2d(glci_channels, 3, 1)  # Output RGB
-#         )
-#
-#     def forward(self, cb_mask_concat):
-#         x = self.encoder(cb_mask_concat)
-#         x = self.glci(x)
-#         return self.decoder(x)
-#
-#
-# class ImaginationBranch(nn.Module):
-#     """
-#     Content Imagination Sub-network
-#     Input: torch.Tensor of shape (B, 4, H, W) [(1 - M_hat) * J || M_hat]
-#     Output: torch.Tensor of shape (B, 3, H, W) - imagined image I_i
-#     """
-#     def __init__(self, glci_channels=64):
-#         super().__init__()
-#         self.encoder = nn.Sequential(
-#             nn.Conv2d(4, glci_channels, 3, padding=1),
-#             nn.ReLU(inplace=True)
-#         )
-#         self.glci = GLCIStack(glci_channels, n_blocks=3)
-#         self.decoder = nn.Sequential(
-#             nn.Conv2d(glci_channels, glci_channels, 3, padding=1),
-#             nn.ReLU(inplace=True),
-#             nn.Conv2d(glci_channels, 3, 1)
-#         )
-#
-#     def forward(self, masked_input):
-#         x = self.encoder(masked_input)
-#         x = self.glci(x)
-#         return self.decoder(x)
-
 
 class RIRCIStage2(nn.Module):
     """
