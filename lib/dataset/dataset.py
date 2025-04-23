@@ -25,7 +25,7 @@ class WatermarkRemovalDataset(Dataset):
             transforms.ToTensor(),
         ])
 
-        self.image_files = sorted(os.listdir(os.path.join(self.root_dir, 'image')))
+        self.image_files = sorted(os.listdir(os.path.join(self.root_dir, 'wm')))
 
     def __len__(self):
         return len(self.image_files)
