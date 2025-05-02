@@ -5,8 +5,6 @@ import torch.nn.functional as F
 
 from torch import nn
 
-from lib.slbr.config import cfg
-
 class ECABlock(nn.Module):
     """Constructs a ECA module.
 

@@ -1,8 +1,8 @@
 import unittest
 import torch
 
-from lib.rirci.glci.base import scSEBlock, SpectralTransform, LocalMLP, GlobalMLP
-from lib.rirci.glci.glci import GLCI, GLCIStack
+from lib.models.rirci.glci.base import scSEBlock, SpectralTransform, LocalMLP, GlobalMLP
+from lib.models.rirci.glci.glci import GLCI, GLCIStack
 
 
 class TestGLCISubmodules(unittest.TestCase):

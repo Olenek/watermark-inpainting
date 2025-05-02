@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from lib.slbr.blocks import UpConv, DownConv, MBEBlock, SMRBlock, ECABlock
+from lib.models.slbr.blocks import UpConv, DownConv, MBEBlock, SMRBlock, ECABlock
 
 def weight_init(m):
     if isinstance(m, nn.Conv2d):

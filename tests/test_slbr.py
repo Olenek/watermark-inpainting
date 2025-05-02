@@ -1,7 +1,7 @@
 import unittest
 import torch
 
-from lib.slbr.resunet import SLBR
+from lib.models.slbr.resunet import SLBR
 
 class TestSLBR(unittest.TestCase):
     def test_slbr(self):

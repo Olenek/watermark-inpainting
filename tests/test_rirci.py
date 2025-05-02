@@ -1,7 +1,7 @@
 import torch
 
-from lib.rirci.exclusion import RIRCIStage1
-from lib.rirci.restoration import RIRCIStage2
+from lib.models.rirci import RIRCIStage1
+from lib.models.rirci.restoration import RIRCIStage2
 
 
 def test_rirci_stage1():

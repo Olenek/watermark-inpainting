@@ -1,6 +1,6 @@
 import torch
 
-from lib.rirci.base import DownBlock, UpBlock, SMRBranch, MBEBranch, ConvBlock
+from lib.models.rirci.base import DownBlock, UpBlock, SMRBranch, MBEBranch, ConvBlock
 
 
 def test_conv_block():
