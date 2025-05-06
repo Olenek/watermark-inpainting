@@ -20,40 +20,40 @@ class Trainer:
                  train_loader: DataLoader,
                  val_loader: DataLoader,
                  early_stopping=True,
-                 early_stop_patience=5,
-                 checkpoint_dir='../data/checkpoints',
-                 device='cpu',):
+                 early_stop_patience=10,
+                 checkpoint_dir='/app/checkpoints/',
+                 log_dir='/app/logs/',
+                 device='cpu', ):
         self.model_type = model_type
         self.epochs = epochs
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.early_stop_patience = early_stop_patience if early_stopping else epochs
-        self.checkpoint_dir = checkpoint_dir
+        self.experiment_name = f"{self.model_type.__name__}-" \
+                               f"{datetime.utcnow().strftime('%Y-%m-%d-%H%M%S')}"
+        self.checkpoint_dir = os.path.join(checkpoint_dir, self.experiment_name)
         self.device = device
 
         # Set up logging with automatic filename
-        self._setup_logging()
+        self._setup_logging(log_dir)
 
-    def _setup_logging(self):
+    def _setup_logging(self, log_dir: str):
         """Configure logging with automatic filename generation."""
         # Create log directory if it doesn't exist
-        log_dir = '../logs'
         os.makedirs(log_dir, exist_ok=True)
 
         # Generate filename with current UTC time
-        model_name = self.model_type.__name__
-        current_time = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
-        log_filename = f"{log_dir}/{model_name}-{current_time}.log"
+        log_filename = f"{log_dir}/{self.experiment_name}.log"
 
         # Configure logger
-        self.logger = logging.getLogger(f"{model_name}_trainer")
+        self.logger = logging.getLogger(f"{self.experiment_name}")
         self.logger.setLevel(logging.INFO)
 
         # File handler
         file_handler = logging.FileHandler(log_filename)
         file_handler.setLevel(logging.INFO)
         file_formatter = logging.Formatter(
-            '%(asctime)s - %(levelname)s - %(message)s',
+            '%(asctime)s - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         file_handler.setFormatter(file_formatter)
@@ -62,7 +62,7 @@ class Trainer:
         # Log initialization message
         self.logger.info(f"Training session started at {datetime.utcnow().isoformat()}Z")
         self.logger.info(f"Logging to: {os.path.abspath(log_filename)}")
-        self.logger.info(f"Model type: {model_name}")
+        self.logger.info(f"Model type: {self.model_type.__name__}")
         self.logger.info(f"Device: {self.device}")
 
     def train_model(self, dry_run=False):
