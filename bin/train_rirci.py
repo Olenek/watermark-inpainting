@@ -11,4 +11,4 @@ train_loader, val_loader = get_dataloaders(data_root='../data/27kpng', batch_siz
 
 trainer = Trainer(RIRCIModel, epochs=100, train_loader=train_loader, val_loader=val_loader, device=device)
 
-trainer.train_model()
+trainer.train_model(model_hyperparams={'simple': True})
