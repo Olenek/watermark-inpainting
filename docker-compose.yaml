@@ -12,11 +12,10 @@ services:
       - "8188:8088"
     volumes:
       - ./:/app  # Mounts entire project for code changes
-      - ./data:/data  # Mounts dataset directory
       - ./notebooks:/app/notebooks  # Persistent notebooks
+      - ~/.avito/certs:/certs
     environment:
       - JUPYTER_ENABLE_LAB=yes
-      - DATA_PATH=/data  # Environment variable for dataset path
     ipc: host
     shm_size: 8G
     command: nohup jupyter lab --allow-root --ip=0.0.0.0 --port=8088 --NotebookApp.token='' --NotebookApp.password=''
